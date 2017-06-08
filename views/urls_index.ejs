@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <header>
+    <% include ./partials/_header %>
+  </header>
+  <title>TinyApp</title>
+</head>
+
+<body>
+    <ul>
+      <% for(let key in urls) { %>
+      <li><%= key + ": "  + urls[key] %>
+        <form method="POST" action= "/urls/<%= key %>/delete">
+        <button>Delete</button>
+
+
+        </form>
+
+        <a href="/urls/<%=key%>"><button> Edit </button></a>
+
+
+      </li>
+      <% } %>
+    </ul>
+
+    <a href=>Click here to make a tinyUrl</a>
+
+
+
+    <!-- Add your EJS code here -->
+</body>
+</html>
