@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!doctype html>
 <html>
     <head>
@@ -23,3 +24,30 @@
 
 
 
+=======
+
+
+
+    <% if(username) { %>
+
+      <form method="POST" action="/logout">
+        <h1>Username: <%= username%></h1>
+        <button>LOGOUT</button>
+
+      </form>
+
+    <% } else{ %>
+
+        <form method="POST" action="/login">
+
+
+
+        <input name="username">
+        <button>Sign In </button>
+
+    </form>
+
+
+
+    <% } %>
+>>>>>>> feature/cookies
