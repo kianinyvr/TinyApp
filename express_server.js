@@ -7,14 +7,8 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 var PORT = process.env.PORT || 8080; // default port 8080
 var random = require("randomstring");
-<<<<<<< HEAD
-var cookieParser = require('cookie-parser');
-app.use(cookieParser());
-
-=======
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
->>>>>>> feature/cookies
 
 var urlDatabase = {
   "b2xVn2" : "http://www.lighthouselabs.ca",
@@ -106,18 +100,10 @@ app.post("/urls/:key/delete", (req, res) => {
   res.redirect("/urls");
 });
 
-<<<<<<< HEAD
-app.post("/login", (req,res) => {
-  res.cookie("username", req.body.username);
-  res.redirect("/urls");
-});
-
-=======
 app.post("/logout", (req,res) => {
   res.clearCookie("username");
   res.redirect("/urls");
 });
->>>>>>> feature/cookies
 
 
 
