@@ -1,10 +1,10 @@
 <!doctype html>
 
 
-    <% if(username) { %>
+    <% if(user) { %>
 
       <form method="POST" action="/logout">
-        <h1>Username: <%= username%></h1>
+        <h1>Username: <%= user.email %></h1>
         <button>LOGOUT</button>
 
       </form>

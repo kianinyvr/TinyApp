@@ -10,12 +10,12 @@ var random = require("randomstring");
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 
-var urlDatabase = {
+const urlDatabase = {
   "b2xVn2" : "http://www.lighthouselabs.ca",
   "9sm5xK" : "http://www.google.com"
 };
 
-var users = {
+const users = {
    example: {
                 id: "example",
                 email: "user@example.com",
@@ -41,22 +41,22 @@ app.get("/hello", (req, res) => {
 
 
 app.get("/urls", (req,res) => {
-  let templateVars = {
+  const templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_index", templateVars);
 });
 
-app.get("/register", (req,res)=> {
+  app.get("/register", (req,res)=> {
   res.render("url_register");
 });
 
 
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = {
-    username: req.cookies["username"]
+  const templateVars = {
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_new", templateVars);
 });
@@ -64,9 +64,9 @@ app.get("/urls/new", (req, res) => {
 
 
 app.get("/urls/:id", (req,res) => {
-  let templateVars = {
+  const templateVars = {
     shortURL: req.params.id,
-    username: req.cookies["username"]
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_show", templateVars);
 });
@@ -113,7 +113,7 @@ app.post("/urls/:key/delete", (req, res) => {
 });
 
 app.post("/logout", (req,res) => {
-  res.clearCookie("username");
+  res.clearCookie("user");
   res.redirect("/urls");
 });
 
@@ -137,13 +137,11 @@ app.post("/register", (req,res) => {
 
   res.cookie("user_id", userID);
 
-  var tempObject = {
-  id : userID,
-  email: req.body.email,
-  password: req.body.password
+  users[userID] = {
+    id : userID,
+    email: req.body.email,
+    password: req.body.password
   };
-
-  users[userID] = tempObject;
 
   res.redirect("/urls");
 
