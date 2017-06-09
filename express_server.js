@@ -102,8 +102,14 @@ app.post("/urls/:key", (req, res) => {
 
 
 app.post("/login", (req,res) => {
-  res.cookie("username", req.body.username);
+  res.cookie("user_id", req.body.email);
   res.redirect("/urls");
+});
+
+app.get("/login", (req,res) => {
+  res.render("url_login");
+
+
 });
 
 
