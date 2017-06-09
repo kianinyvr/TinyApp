@@ -119,7 +119,7 @@ app.post("/logout", (req,res) => {
 
 app.post("/register", (req,res) => {
 
-  const userID = generateRandomString();
+
 
   if(req.body.email === "" || req.body.password ===""){
     res.status(400).send("400: Oh uh, something went wrong");
@@ -127,13 +127,15 @@ app.post("/register", (req,res) => {
   };
 
 
-  if(findEmail(users, req.body.email) === true){
+  if(findEmail(users, req.body.email) === req.body.email){
     res.status(400).send("400: User already exists");
     return;
   };
 
+  const userID = generateRandomString();
 
-  res.cookie("userID", userID);
+
+  res.cookie("user_id", userID);
 
   var tempObject = {
   id : userID,
@@ -158,19 +160,13 @@ function generateRandomString() {
 };
 
 function findEmail(obj, email){
+  let found;
   for(key in obj){
-    console.log("OBJ[key]: ", obj[key]);
-    console.log("Email: ", email);
-    console.log("obj[key].email", obj[key].email);
     if(obj[key].email === email) {
-
-      return true;
+      found = email;
     }
   }
-
-
-
-  return false;
+  return found;
 };
 
 
