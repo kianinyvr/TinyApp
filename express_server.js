@@ -102,8 +102,24 @@ app.post("/urls/:key", (req, res) => {
 
 
 app.post("/login", (req,res) => {
-  res.cookie("user_id", req.body.email);
-  res.redirect("/urls");
+
+  const email = req.body.email;
+  const password = req.body.password;
+
+  for (const id in users){
+    if(users[id].email === email){
+      //email matches, check for password
+      if(users[id].password === password){
+        cookies.set(user[id].id);
+        res.redirect("/urls");
+      }
+      res.status(403).send("403: Incorrect Password");
+      return;
+    }
+  }
+
+  res.status(403).send("403: Username doesn't exist");
+  return;
 });
 
 app.get("/login", (req,res) => {
