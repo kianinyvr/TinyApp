@@ -15,19 +15,13 @@ var urlDatabase = {
   "9sm5xK" : "http://www.google.com"
 };
 
-const user = {
-  "user1": {
-    id: "userID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur"
-  },
-
-  "user2": {
-    id: "user2ID",
-    email: "user2@example.com",
-    password: "bob"
-  }
-}
+var users = {
+   example: {
+                id: "example",
+                email: "user@example.com",
+                password: "purple-monkey-dinosaur"
+              }
+};
 
 
 app.get("/", (req, res) => {
@@ -124,6 +118,33 @@ app.post("/logout", (req,res) => {
 });
 
 app.post("/register", (req,res) => {
+
+  const userID = generateRandomString();
+
+  if(req.body.email === "" || req.body.password ===""){
+    res.status(400).send("400: Oh uh, something went wrong");
+    return;
+  };
+
+
+  if(findEmail(users, req.body.email) === true){
+    res.status(400).send("400: User already exists");
+    return;
+  };
+
+
+  res.cookie("userID", userID);
+
+  var tempObject = {
+  id : userID,
+  email: req.body.email,
+  password: req.body.password
+  };
+
+  users[userID] = tempObject;
+
+  res.redirect("/urls");
+
 });
 
 
@@ -134,6 +155,22 @@ app.listen(PORT, () => {
 
 function generateRandomString() {
   return random.generate(6);
+};
+
+function findEmail(obj, email){
+  for(key in obj){
+    console.log("OBJ[key]: ", obj[key]);
+    console.log("Email: ", email);
+    console.log("obj[key].email", obj[key].email);
+    if(obj[key].email === email) {
+
+      return true;
+    }
+  }
+
+
+
+  return false;
 };
 
 
