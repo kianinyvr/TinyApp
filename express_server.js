@@ -10,9 +10,17 @@ var random = require("randomstring");
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 
-var urlDatabase = {
+const urlDatabase = {
   "b2xVn2" : "http://www.lighthouselabs.ca",
   "9sm5xK" : "http://www.google.com"
+};
+
+const users = {
+   example: {
+                id: "example",
+                email: "user@example.com",
+                password: "purple-monkey-dinosaur"
+              }
 };
 
 
@@ -33,18 +41,22 @@ app.get("/hello", (req, res) => {
 
 
 app.get("/urls", (req,res) => {
-  let templateVars = {
+  const templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_index", templateVars);
+});
+
+  app.get("/register", (req,res)=> {
+  res.render("url_register");
 });
 
 
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = {
-    username: req.cookies["username"]
+  const templateVars = {
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_new", templateVars);
 });
@@ -52,9 +64,9 @@ app.get("/urls/new", (req, res) => {
 
 
 app.get("/urls/:id", (req,res) => {
-  let templateVars = {
+  const templateVars = {
     shortURL: req.params.id,
-    username: req.cookies["username"]
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_show", templateVars);
 });
@@ -90,8 +102,30 @@ app.post("/urls/:key", (req, res) => {
 
 
 app.post("/login", (req,res) => {
-  res.cookie("username", req.body.username);
-  res.redirect("/urls");
+
+  const email = req.body.email;
+  const password = req.body.password;
+
+  for (const id in users){
+    if(users[id].email === email){
+      //email matches, check for password
+      if(users[id].password === password){
+        cookies.set(user[id].id);
+        res.redirect("/urls");
+      }
+      res.status(403).send("403: Incorrect Password");
+      return;
+    }
+  }
+
+  res.status(403).send("403: Username doesn't exist");
+  return;
+});
+
+app.get("/login", (req,res) => {
+  res.render("url_login");
+
+
 });
 
 
@@ -101,8 +135,38 @@ app.post("/urls/:key/delete", (req, res) => {
 });
 
 app.post("/logout", (req,res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
+});
+
+app.post("/register", (req,res) => {
+
+
+
+  if(req.body.email === "" || req.body.password ===""){
+    res.status(400).send("400: Oh uh, something went wrong");
+    return;
+  };
+
+
+  if(findEmail(users, req.body.email) === req.body.email){
+    res.status(400).send("400: User already exists");
+    return;
+  };
+
+  const userID = generateRandomString();
+
+
+  res.cookie("user_id", userID);
+
+  users[userID] = {
+    id : userID,
+    email: req.body.email,
+    password: req.body.password
+  };
+
+  res.redirect("/urls");
+
 });
 
 
@@ -113,6 +177,16 @@ app.listen(PORT, () => {
 
 function generateRandomString() {
   return random.generate(6);
+};
+
+function findEmail(obj, email){
+  let found;
+  for(key in obj){
+    if(obj[key].email === email) {
+      found = email;
+    }
+  }
+  return found;
 };
 
 

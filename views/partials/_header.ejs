@@ -1,25 +1,7 @@
+HEADER!!!!!!!
 
+<a href="/register"> Register </a>
 
-
-    <% if(username) { %>
-
-      <form method="POST" action="/logout">
-        <h1>Username: <%= username%></h1>
-        <button>LOGOUT</button>
-
-      </form>
-
-    <% } else{ %>
-
-        <form method="POST" action="/login">
-
-
-
-        <input name="username">
-        <button>Sign In </button>
-
-    </form>
-
-
-
-    <% } %>
+<form method="POST" action="/logout">
+<button>Logout</button>
+</form>
