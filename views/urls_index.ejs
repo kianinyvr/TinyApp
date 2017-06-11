@@ -9,7 +9,8 @@
 <body>
     <ul>
       <% for(let key in urls) { %>
-      <li><%= key + ": "  + urls[key] %>
+
+      <li><%= key + ": "  + urls[key].url %>
         <form method="POST" action= "/urls/<%= key %>/delete">
         <button>Delete</button>
 

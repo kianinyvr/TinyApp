@@ -10,18 +10,76 @@ var random = require("randomstring");
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 
+const bcrypt = require("bcrypt");
+let hashed = "";
+
 const urlDatabase = {
-  "b2xVn2" : "http://www.lighthouselabs.ca",
-  "9sm5xK" : "http://www.google.com"
+  "b2xVn2" : {
+                url: "http://www.lighthouselabs.ca",
+                user_id: "example"
+              },
+
+  "9sm5xK" : {
+                url: "http://www.google.com",
+                user_id: "example"
+              }
 };
 
 const users = {
    example: {
                 id: "example",
-                email: "user@example.com",
-                password: "purple-monkey-dinosaur"
-              }
+                email: "kian.akhavan@gmail.com",
+                password: "fransen34"
+            },
+
+    bob:    {
+                id: "bob",
+                email: "bob@gmail.com",
+                password: "fransen34"
+            }
 };
+
+userDB = {};
+
+
+
+
+
+//setting local variable that refers to value of user id cookie
+
+app.use((req, res, next) => {
+  res.locals.user_id = req.cookies.user_id;
+  next();
+})
+
+
+//mw for checking if user is signed in
+
+app.use((req,res, next) => {
+  console.log("UPDATED URL DATABASE: " , urlDatabase);
+  console.log("----------------------------------------------------");
+  next();
+});
+
+
+
+
+app.use("/urls", (req, res, next) => {
+  if(req.cookies.user_id){
+    next();
+  }
+  else {
+    res.status(403).send("Error: 403 you need to be logged in to view this page <br> <a href='/login'> Go to login </a>");
+  }
+});
+
+
+// updating the url database to only include those where the logged in user has access to them
+
+// app.use("/urls", (req, res, next) => {
+//   f
+//   next()
+// });
 
 
 app.get("/", (req, res) => {
@@ -41,24 +99,33 @@ app.get("/hello", (req, res) => {
 
 
 app.get("/urls", (req,res) => {
+
   const templateVars = {
-    urls: urlDatabase,
+    urls: urlsForUser(res.locals.user_id),
     user: users[req.cookies["user_id"]]
   };
+
+  console.log("XXXXXXX");
+  console.log("HASHED: ", hashed);
+
   res.render("urls_index", templateVars);
 });
 
-  app.get("/register", (req,res)=> {
+app.get("/register", (req,res)=> {
   res.render("url_register");
 });
 
 
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = {
-    user: users[req.cookies["user_id"]]
-  };
-  res.render("urls_new", templateVars);
+    const templateVars = {
+    urls: urlsForUser(res.locals.user_id),
+    user: users[req.locals.user_id]
+
+    };
+
+
+    res.render("urls_new", templateVars);
 });
 
 
@@ -78,15 +145,20 @@ app.get("/urls/:key", (req, res) => {
 
 
 app.post("/urls", (req, res) => {
-  urlDatabase[generateRandomString(req.body.longURL)] = req.body.longURL;
-  console.log(req.body);
-  res.send("Ok");
+
+
+      const key = generateRandomString(req.body.longURL);
+      urlDatabase[key] = {
+        url: req.body.longURL,
+        user_id: res.locals.user_id
+      };
+  res.redirect("/urls/" + key);
 });
 
 
 app.get("/u/:shortURL", (req, res) => {
   //let longURL =
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL].url;
   res.redirect(longURL);
 });
 
@@ -109,8 +181,9 @@ app.post("/login", (req,res) => {
   for (const id in users){
     if(users[id].email === email){
       //email matches, check for password
-      if(users[id].password === password){
-        cookies.set(user[id].id);
+      // (users[id].password === password)
+      if(bcrypt.compareSync(password, hashed)){
+        res.cookie("user_id", id);
         res.redirect("/urls");
       }
       res.status(403).send("403: Incorrect Password");
@@ -131,10 +204,12 @@ app.get("/login", (req,res) => {
 
 app.post("/urls/:key/delete", (req, res) => {
   delete urlDatabase[req.params.key];
+  console.log(urlDatabase);
   res.redirect("/urls");
 });
 
 app.post("/logout", (req,res) => {
+  hashed = "";
   res.clearCookie("user_id");
   res.redirect("/urls");
 });
@@ -156,13 +231,15 @@ app.post("/register", (req,res) => {
 
   const userID = generateRandomString();
 
+  hashed = bcrypt.hashSync(req.body.password, 5);
+
 
   res.cookie("user_id", userID);
 
   users[userID] = {
     id : userID,
     email: req.body.email,
-    password: req.body.password
+    password: hashed
   };
 
   res.redirect("/urls");
@@ -187,6 +264,26 @@ function findEmail(obj, email){
     }
   }
   return found;
+};
+
+function urlsForUser(id){
+  console.log("BEFORE FOR LOOP ID", id)
+  // console.log("BEFORE FOR LOOP DATABASE PASSED IN IS :", urlDatabase)
+  for(let key in urlDatabase){
+    console.log("IN FOR LOOK at KEY", key);
+    console.log("urlDB AT KEY IS: ", urlDatabase[key].user_id)
+    if(urlDatabase[key].user_id === id){
+      console.log("userDB NOW AT: ", userDB)
+      userDB[key] = { url: urlDatabase[key].url,
+                      user_id: urlDatabase[key].user_id
+                    };
+    };
+
+    console.log("IN FUNCTION: ", userDB);
+  };
+
+  return userDB;
+
 };
 
 

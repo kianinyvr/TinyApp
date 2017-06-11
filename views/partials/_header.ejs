@@ -1,7 +1,20 @@
 HEADER!!!!!!!
 
-<a href="/register"> Register </a>
 
-<form method="POST" action="/logout">
-<button>Logout</button>
-</form>
+
+
+
+
+
+
+<% if(user_id) { %>
+    <%= user_id %>
+    <form method="POST" action="/logout">
+    <button>Logout</button>
+    </form>
+<% } else { %>
+
+    <a href="/register"> Register </a>
+    <a href="/login"> Login </a>
+
+<% } %>
