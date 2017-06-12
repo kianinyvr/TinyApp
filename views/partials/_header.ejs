@@ -1,20 +1,16 @@
-HEADER!!!!!!!
-
-
-
-
-
-
-
 
 <% if(user_id) { %>
-    <%= user_id %>
+    <h1> Welcome to TinyApp </h1>
+    <i> make short urls without hassle </i><br><br>
+    <%=  "You are signed in as:  " + user.email %>
     <form method="POST" action="/logout">
-    <button>Logout</button>
+    <button>Logout</button><br>
     </form>
 <% } else { %>
-
-    <a href="/register"> Register </a>
+    <h1> Welcome to TinyApp</h1>
+    <i> make short urls without the hassle. </i><br><br>
+    <a href="/register"> Register </a><br>
     <a href="/login"> Login </a>
 
 <% } %>
+<br><br>
